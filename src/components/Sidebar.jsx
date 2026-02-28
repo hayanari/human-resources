@@ -71,7 +71,7 @@ export default function Sidebar({ content, page, setPage }) {
               className="sb-item"
               id={item.id}
               onClick={() => handleFootAction(item)}
-              style={item.style}
+              style={typeof item.style === 'object' && item.style !== null ? item.style : undefined}
             >
               <span className="sb-ico">{item.icon}</span>
               {item.label}

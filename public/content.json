@@ -51,7 +51,7 @@
     "foot": [
       { "action": "nav_userMgmt", "icon": "👤", "label": "ユーザー管理", "id": "sb-usermgmt" },
       { "action": "changePw", "icon": "🔑", "label": "パスワード変更" },
-      { "action": "logout", "icon": "🚪", "label": "ログアウト", "style": "color:var(--d)" }
+      { "action": "logout", "icon": "🚪", "label": "ログアウト", "style": { "color": "var(--d)" } }
     ]
   },
   "pages": {
