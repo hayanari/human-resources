@@ -79,13 +79,51 @@ async function delEmpFromSupabase(id){if(!sb())return;try{const {error}=await sb
 async function saveEvalToSupabase(v){if(!sb())return;try{if(v.id){const {error}=await sb().from('evaluations').update({period:v.period,satei:v.satei,eval_1st:v.eval1st,eval_2nd:v.eval2nd,comment:v.comment,comp_scores:v.compScores||{},kpi_scores:v.kpiScores||{}}).eq('id',v.id);if(error)throw error;}else{const {data,error}=await sb().from('evaluations').insert(evalToRow(v)).select('id').single();if(error)throw error;if(data)v.id=data.id;}}catch(err){console.error('Supabase saveEval error:',err);toast('Supabase評価保存に失敗','err');}}
 async function delEvalFromSupabase(v){if(!sb()||!v.id)return;try{const {error}=await sb().from('evaluations').delete().eq('id',v.id);if(error)throw error;}catch(err){console.error('Supabase delEval error:',err);}}
 
+// ─── CONTENT (JSON) ───
+let CONTENT={};
+const DEFAULT_PAGE_TITLES={dashboard:'ダッシュボード',employees:'人材情報',org:'組織図',certs:'資格管理',skillmap:'スキルマップ',evaluation:'人事評価','eval-settings':'評価項目設定','labor-cost':'労務コスト管理',analytics:'活躍分析・採用',placement:'最適配置',attrition:'離職抑止・分析',detail:'社員詳細'};
+function getPageTitle(pg){return (CONTENT.pages&&CONTENT.pages[pg]?.title)||DEFAULT_PAGE_TITLES[pg]||pg;}
+async function loadContent(){try{const r=await fetch('/content.json');if(r.ok)CONTENT=await r.json();}catch(e){console.warn('content.json not loaded, using defaults');}if(!CONTENT.pages)CONTENT.pages={};updateUIFromContent();}
+function updateUIFromContent(){
+  var L=CONTENT.login,N=CONTENT.nav,A=CONTENT.app,T=CONTENT.topbar;
+  if(L){
+    var lt=document.querySelector('.login-title'),ls=document.querySelector('.login-sub');
+    if(lt)lt.textContent=L.title||'HRナビ Pro';if(ls)ls.textContent=L.subtitle||'';
+    var l1=document.querySelector('.login-fg .login-label');if(l1)l1.textContent=L.userIdLabel||'ユーザーID';
+    var li=document.getElementById('li-id'),lp=document.getElementById('li-pw');
+    if(li){li.placeholder=L.userIdPlaceholder||'';}if(lp){lp.placeholder=L.passwordPlaceholder||'';}
+    var l2=document.querySelectorAll('.login-fg .login-label');if(l2[1])l2[1].textContent=L.passwordLabel||'パスワード';
+    var lb=document.getElementById('login-btn');if(lb)lb.textContent=L.loginButton||'ログイン →';
+    var dt=document.querySelector('.login-demo-title');if(dt)dt.textContent=L.demoTitle||'デモアカウント（クリックでログイン）';
+    var dr=document.querySelector('.login-demo-rows');if(dr&&L.demoAccounts?.length){dr.innerHTML=L.demoAccounts.map(a=>'<div class="login-demo-row" data-uid="'+a.id+'" data-pw="'+a.pw+'"><div class="login-demo-id">'+a.label+'</div><span class="login-demo-role '+(a.roleClass||'')+'">'+a.role+'</span></div>').join('');bindLoginDemoRows();}
+  }
+  if(N?.sections){
+    var sbNav=document.querySelector('.sb-nav');if(sbNav){var html=N.sections.map(sec=>'<div class="sb-sec"><div class="sb-sec-lbl">'+sec.label+'</div>'+sec.items.map(it=>'<div class="sb-item'+(it.badge?' sb-badge-wrap':'')+'" onclick="nav(\''+it.page+'\')" data-page="'+it.page+'"><span class="sb-ico">'+it.icon+'</span>'+it.label+(it.badge?'<span class="sb-badge" id="'+it.badge+'"></span>':'')+'</div>').join('')+'</div>').join('');sbNav.innerHTML=html;}
+  }
+  if(A){
+    var st=document.querySelector('.sb-text');if(st)st.innerHTML='HR<span>ナビ</span>';
+    var sv=document.querySelector('.sb-ver');if(sv)sv.textContent=A.version||'Pro v3.0';
+  }
+  if(T){
+    var ol=document.querySelector('.top-acts button[onclick*="openLoadModal"]');if(ol)ol.textContent=T.loadData||'📂 データ読み込み';
+    var ae=document.getElementById('btn-add');if(ae)ae.textContent=T.addEmp||'＋ 社員追加';
+    var ex=document.getElementById('btn-exp');if(ex)ex.textContent=T.saveExcel||'💾 Excel保存';
+  }
+  if(CONTENT.dashboard){
+    var db=document.getElementById('dash-body');if(db&&CONTENT.dashboard.welcomeTitle){
+      var steps=(CONTENT.dashboard.steps||[]).map(s=>'<div class="w-step"><div class="w-step-n">'+s.n+'</div><div class="w-step-t">'+s.title+'</div><div class="w-step-d">'+s.desc+'</div></div>').join('');
+      db.innerHTML='<div class="welcome"><div class="w-icon">📋</div><div class="w-title">'+CONTENT.dashboard.welcomeTitle+'</div><div class="w-sub">'+CONTENT.dashboard.welcomeSub+'</div><div class="w-steps">'+steps+'</div><div onclick="openLoadModal()" style="cursor:pointer"><div class="file-drop"><div class="fd-ico">📂</div><div class="fd-txt">'+(CONTENT.dashboard.fileDropTitle||'クリックしてデータを読み込む')+'</div><div class="fd-sub">'+(CONTENT.dashboard.fileDropSub||'Excel ＋ 顔写真をまとめて選択できます')+'</div></div></div></div>';
+    }
+  }
+}
+function bindLoginDemoRows(){document.querySelectorAll('.login-demo-row').forEach(function(row){var uid=row.getAttribute('data-uid'),pw=row.getAttribute('data-pw');if(uid&&pw){row.addEventListener('click',function(){doLoginQuick(uid,pw);});row.style.cursor='pointer';}});}
+
 // ─── NAV ───
-const PAGE_TITLES={dashboard:'ダッシュボード',employees:'人材情報',org:'組織図',certs:'資格管理',skillmap:'スキルマップ',evaluation:'人事評価','eval-settings':'評価項目設定','labor-cost':'労務コスト管理',analytics:'活躍分析・採用',placement:'最適配置',attrition:'離職抑止・分析',detail:'社員詳細'};
 
 function compIH(v){
   return v||'';
 }
-function nav(pg){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));document.getElementById('page-'+pg).classList.add('active');document.getElementById('page-title').textContent=PAGE_TITLES[pg]||pg;const idx={dashboard:0,employees:1,org:2,certs:3,skillmap:4,evaluation:5,'eval-settings':6,'labor-cost':7,analytics:8,placement:9,attrition:10};const items=document.querySelectorAll('.sb-item');if(idx[pg]!==undefined)items[idx[pg]].classList.add('active');({dashboard:renderDash,employees:renderEmps,org:renderOrg,certs:renderCerts,skillmap:renderSkillMap,evaluation:renderEvalList,'eval-settings':renderEvalSettings,'labor-cost':renderLaborCost,analytics:renderAnalytics,placement:renderPlacement,attrition:renderAttrition})[pg]?.();}
+function nav(pg){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));var items=document.querySelectorAll('.sb-item');var found=!1;items.forEach(i=>{i.classList.remove('active');if(i.getAttribute('data-page')===pg){i.classList.add('active');found=!0;}});if(!found){var idx={dashboard:0,employees:1,org:2,certs:3,skillmap:4,evaluation:5,'eval-settings':6,'labor-cost':7,analytics:8,placement:9,attrition:10};if(idx[pg]!==undefined)items[idx[pg]]?.classList.add('active');}var pt=document.getElementById('page-'+pg);if(pt)pt.classList.add('active');document.getElementById('page-title').textContent=getPageTitle(pg);({dashboard:renderDash,employees:renderEmps,org:renderOrg,certs:renderCerts,skillmap:renderSkillMap,evaluation:renderEvalList,'eval-settings':renderEvalSettings,'labor-cost':renderLaborCost,analytics:renderAnalytics,placement:renderPlacement,attrition:renderAttrition})[pg]?.();}
 
 // ─── LOAD ───
 function openLoadModal(){pendingExcel=null;pendingPhotos=[];document.getElementById('ex-lbl').innerHTML=`<div style="font-size:24px;margin-bottom:5px">📋</div><div style="font-weight:700;color:var(--p);font-size:13px">社員データ.xlsx を選択</div><div style="font-size:11.5px;color:var(--txm);margin-top:3px">.xlsx / .xls</div>`;document.getElementById('ph-lbl').innerHTML=`<div style="font-size:24px;margin-bottom:5px">🗂</div><div style="font-weight:700;color:var(--p);font-size:13px">顔写真を複数選択</div><div style="font-size:11.5px;color:var(--txm);margin-top:3px">EMP001.jpg のように命名</div>`;['ex-drop','ph-drop'].forEach(id=>document.getElementById(id).classList.remove('loaded'));document.getElementById('ld-status').style.display='none';const btn=document.getElementById('do-load-btn');btn.disabled=true;btn.style.opacity='.5';btn.textContent='読み込む';openMo('load-mo');}
@@ -704,6 +742,7 @@ function resumeData(){
 // ─── STARTUP ───
 async function startup(){
   try{
+    await loadContent();
     initUsers();
     var restored=restoreSession();
     if(restored){
@@ -739,6 +778,12 @@ async function startup(){
     if(overlay) overlay.classList.remove('hidden');
   }
 }
+// ログインボタン・デモ行を addEventListener でバインド（Vite モジュールビルドでも確実に動作）
+function initLoginHandlers(){
+  var lb=document.getElementById('login-btn');
+  if(lb)lb.addEventListener('click',doLogin);
+  bindLoginDemoRows();
+}
 // Vite がモジュールとしてビルドするため、onclick から呼ぶ関数を window に公開
 if(typeof window!=='undefined'){
   window.doLogin=doLogin;window.doLoginQuick=doLoginQuick;window.nav=nav;window.nav_userMgmt=nav_userMgmt;
@@ -755,4 +800,5 @@ if(typeof window!=='undefined'){
   if(typeof onEvalEmpChange==='function')window.onEvalEmpChange=onEvalEmpChange;
   if(typeof saveEval==='function')window.saveEval=saveEval;
 }
+initLoginHandlers();
 startup();

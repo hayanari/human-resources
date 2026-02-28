@@ -1,0 +1,87 @@
+{
+  "app": {
+    "title": "HRナビ Pro",
+    "version": "Pro v3.0",
+    "subtitle": "Excel連携 · OneDrive対応"
+  },
+  "login": {
+    "title": "HRナビ Pro",
+    "subtitle": "ユーザーIDとパスワードでログイン",
+    "userIdLabel": "ユーザーID",
+    "userIdPlaceholder": "例: admin",
+    "passwordLabel": "パスワード",
+    "passwordPlaceholder": "パスワードを入力",
+    "loginButton": "ログイン →",
+    "demoTitle": "デモアカウント（クリックでログイン）",
+    "demoAccounts": [
+      { "id": "admin", "pw": "admin123", "label": "admin / admin123", "role": "管理者", "roleClass": "role-admin" },
+      { "id": "evaluator1", "pw": "eval123", "label": "evaluator1 / eval123", "role": "評価者", "roleClass": "role-evaluator" },
+      { "id": "viewer1", "pw": "view123", "label": "viewer1 / view123", "role": "閲覧者", "roleClass": "role-viewer" }
+    ]
+  },
+  "nav": {
+    "sections": [
+      {
+        "label": "メイン",
+        "items": [
+          { "page": "dashboard", "icon": "🏠", "label": "ダッシュボード" },
+          { "page": "employees", "icon": "👥", "label": "人材情報" },
+          { "page": "org", "icon": "🏢", "label": "組織図" }
+        ]
+      },
+      {
+        "label": "評価・育成",
+        "items": [
+          { "page": "certs", "icon": "🎓", "label": "資格管理", "badge": "alert-badge" },
+          { "page": "skillmap", "icon": "🗺️", "label": "スキルマップ" },
+          { "page": "evaluation", "icon": "📊", "label": "人事評価" },
+          { "page": "eval-settings", "icon": "⚙️", "label": "評価項目設定" },
+          { "page": "labor-cost", "icon": "💰", "label": "労務コスト管理" }
+        ]
+      },
+      {
+        "label": "分析・戦略",
+        "items": [
+          { "page": "analytics", "icon": "📈", "label": "活躍分析・採用" },
+          { "page": "placement", "icon": "🔄", "label": "最適配置" },
+          { "page": "attrition", "icon": "🚨", "label": "離職抑止・分析" }
+        ]
+      }
+    ],
+    "foot": [
+      { "action": "nav_userMgmt", "icon": "👤", "label": "ユーザー管理", "id": "sb-usermgmt" },
+      { "action": "changePw", "icon": "🔑", "label": "パスワード変更" },
+      { "action": "logout", "icon": "🚪", "label": "ログアウト", "style": "color:var(--d)" }
+    ]
+  },
+  "pages": {
+    "dashboard": { "title": "ダッシュボード" },
+    "employees": { "title": "人材情報" },
+    "org": { "title": "組織図" },
+    "certs": { "title": "資格管理" },
+    "skillmap": { "title": "スキルマップ" },
+    "evaluation": { "title": "人事評価" },
+    "eval-settings": { "title": "評価項目設定" },
+    "labor-cost": { "title": "労務コスト管理" },
+    "analytics": { "title": "活躍分析・採用" },
+    "placement": { "title": "最適配置" },
+    "attrition": { "title": "離職抑止・分析" },
+    "detail": { "title": "社員詳細" }
+  },
+  "topbar": {
+    "loadData": "📂 データ読み込み",
+    "addEmp": "＋ 社員追加",
+    "saveExcel": "💾 Excel保存"
+  },
+  "dashboard": {
+    "welcomeTitle": "HRナビ Pro へようこそ",
+    "welcomeSub": "社員データ.xlsx と顔写真をまとめて読み込んで<br>タレントマネジメントを開始しましょう",
+    "steps": [
+      { "n": 1, "title": "Excelを読み込む", "desc": "社員データ.xlsxを選択" },
+      { "n": 2, "title": "顔写真（任意）", "desc": "EMP001.jpgのように命名" },
+      { "n": 3, "title": "全機能が使えます", "desc": "評価・分析・配置を活用" }
+    ],
+    "fileDropTitle": "クリックしてデータを読み込む",
+    "fileDropSub": "Excel ＋ 顔写真をまとめて選択できます"
+  }
+}

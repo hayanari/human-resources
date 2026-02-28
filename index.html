@@ -34,20 +34,20 @@
       <input class="login-inp" id="li-pw" type="password" placeholder="パスワードを入力" autocomplete="current-password"
         onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <button class="login-btn" onclick="doLogin()">ログイン →</button>
+    <button class="login-btn" type="button" id="login-btn">ログイン →</button>
     <div class="login-err" id="li-err"></div>
     <div class="login-demo">
       <div class="login-demo-title">デモアカウント（クリックでログイン）</div>
       <div class="login-demo-rows">
-        <div class="login-demo-row" onclick="doLoginQuick('admin','admin123')">
+        <div class="login-demo-row" data-uid="admin" data-pw="admin123">
           <div class="login-demo-id">admin / admin123</div>
           <span class="login-demo-role role-admin">管理者</span>
         </div>
-        <div class="login-demo-row" onclick="doLoginQuick('evaluator1','eval123')">
+        <div class="login-demo-row" data-uid="evaluator1" data-pw="eval123">
           <div class="login-demo-id">evaluator1 / eval123</div>
           <span class="login-demo-role role-evaluator">評価者</span>
         </div>
-        <div class="login-demo-row" onclick="doLoginQuick('viewer1','view123')">
+        <div class="login-demo-row" data-uid="viewer1" data-pw="view123">
           <div class="login-demo-id">viewer1 / view123</div>
           <span class="login-demo-role role-viewer">閲覧者</span>
         </div>
