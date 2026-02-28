@@ -739,4 +739,20 @@ async function startup(){
     if(overlay) overlay.classList.remove('hidden');
   }
 }
+// Vite がモジュールとしてビルドするため、onclick から呼ぶ関数を window に公開
+if(typeof window!=='undefined'){
+  window.doLogin=doLogin;window.doLoginQuick=doLoginQuick;window.nav=nav;window.nav_userMgmt=nav_userMgmt;
+  window.changePw=changePw;window.logout=logout;window.openLoadModal=openLoadModal;window.openEmpMo=openEmpMo;
+  window.exportExcel=exportExcel;window.resetEvalItems=resetEvalItems;window.saveEvalSettings=saveEvalSettings;
+  window.closeMo=closeMo;window.addGradeHistoryRow=addGradeHistoryRow;window.addTransferRow=addTransferRow;window.addCertRow=addCertRow;
+  window.saveEmp=saveEmp;window.addSkillRow=addSkillRow;window.saveSkillSettings=saveSkillSettings;
+  window.openAddUser=openAddUser;window.saveUser=saveUser;window.saveChangePw=saveChangePw;window.resumeData=resumeData;
+  window.toggleDept=toggleDept;window.toggleCert=toggleCert;window.toggleSL=toggleSL;window.swTab=swTab;
+  window.showDetail=showDetail;window.delEmp=delEmp;window.renderEmps=renderEmps;window.renderSkillMap=renderSkillMap;window.renderEvalList=renderEvalList;
+  window.editUser=editUser;window.delUser=delUser;
+  if(typeof openSkillSetMo==='function')window.openSkillSetMo=openSkillSetMo;
+  if(typeof openEvalMo==='function')window.openEvalMo=openEvalMo;
+  if(typeof onEvalEmpChange==='function')window.onEvalEmpChange=onEvalEmpChange;
+  if(typeof saveEval==='function')window.saveEval=saveEval;
+}
 startup();
