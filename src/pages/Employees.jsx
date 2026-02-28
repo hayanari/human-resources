@@ -41,7 +41,7 @@ function EmpCard({ emp, photoMap }) {
   );
 }
 
-export default function Employees({ content }) {
+export default function Employees({ content, onOpenAddEmp }) {
   const { emps, photoMap } = useApp();
   const [search, setSearch] = useState('');
   const [deptFilter, setDeptFilter] = useState('');
@@ -108,7 +108,9 @@ export default function Employees({ content }) {
             </option>
           ))}
         </select>
-        <button className="btn btn-p">＋ 社員追加</button>
+        <button className="btn btn-p" onClick={() => onOpenAddEmp?.()}>
+          ＋ 社員追加
+        </button>
       </div>
       <div className="egrid" id="emp-grid">
         {byDept.length > 0 ? (

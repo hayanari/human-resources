@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { useApp } from '../context/AppContext';
+import { getSkillItems } from '../lib/skillItems';
 
 function fmtD(v) {
   if (!v) return '';
@@ -60,10 +61,8 @@ function parseTransferHistory(row) {
   return h;
 }
 
-const DEFAULT_SKILLS = ['施工管理', '測量', 'AutoCAD'];
-let skillItems = JSON.parse(localStorage.getItem('hr-skills') || 'null') || [...DEFAULT_SKILLS];
-
 function parseSLvs(row) {
+  const skillItems = getSkillItems();
   const sl = {};
   skillItems.forEach((sk) => {
     const v = row[`スキル_${sk}`];

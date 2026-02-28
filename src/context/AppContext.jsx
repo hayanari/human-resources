@@ -142,6 +142,62 @@ export function AppProvider({ children }) {
     }));
   }, []);
 
+  const addEmployee = useCallback(async (emp) => {
+    const newEmp = {
+      id: emp.id?.trim() || `EMP${Date.now().toString().slice(-6)}`,
+      name: emp.name?.trim() || '',
+      belong: emp.belong || '', dept: emp.dept || '', position: emp.position || '',
+      jobType: emp.jobType || '', grade: emp.grade || '', goubou: emp.goubou || '',
+      email: emp.email || '', phone: emp.phone || '',
+      joined: emp.joined || '', dob: emp.dob || '', zip: emp.zip || '', address: emp.address || '',
+      nameChanged: emp.nameChanged || '', addressChanged: emp.addressChanged || '',
+      skills: emp.skills || [], notes: emp.notes || '',
+      certs: emp.certs || [], gradeHistory: emp.gradeHistory || [], transferHistory: emp.transferHistory || [],
+      skillLevels: emp.skillLevels || {},
+    };
+    const exists = emps.some((e) => e.id === newEmp.id);
+    if (exists) return { ok: false, msg: `社員番号「${newEmp.id}」は既に存在します` };
+    setEmps((prev) => {
+      const next = [...prev, newEmp];
+      persistData(next, evals, photoMap);
+      return next;
+    });
+    const sb = window.supabaseClient;
+    if (sb) {
+      try {
+        await sb.from('employees').insert({
+          id: newEmp.id, name: newEmp.name, belong: newEmp.belong || null, dept: newEmp.dept || null,
+          position: newEmp.position || null, job_type: newEmp.jobType || null, grade: newEmp.grade || null,
+          goubou: newEmp.goubou || null, email: newEmp.email || null, phone: newEmp.phone || null,
+          joined: newEmp.joined || null, dob: newEmp.dob || null, zip: newEmp.zip || null, address: newEmp.address || null,
+          name_changed: newEmp.nameChanged || null, address_changed: newEmp.addressChanged || null,
+          skills: newEmp.skills || [], notes: newEmp.notes || null, certs: newEmp.certs || [],
+          grade_history: newEmp.gradeHistory || [], transfer_history: newEmp.transferHistory || [],
+          skill_levels: newEmp.skillLevels || {},
+        });
+      } catch (err) {
+        console.warn('Supabase insert failed:', err);
+      }
+    }
+    return { ok: true, id: newEmp.id };
+  }, [emps, evals, photoMap, persistData]);
+
+  const updateEmployee = useCallback(async (empId, updates) => {
+    setEmps((prev) => {
+      const next = prev.map((e) => (e.id === empId ? { ...e, ...updates } : e));
+      persistData(next, evals, photoMap);
+      return next;
+    });
+    const sb = window.supabaseClient;
+    if (sb && updates.skillLevels !== undefined) {
+      try {
+        await sb.from('employees').update({ skill_levels: updates.skillLevels, updated_at: new Date().toISOString() }).eq('id', empId);
+      } catch (err) {
+        console.warn('Supabase skill update failed:', err);
+      }
+    }
+  }, [evals, photoMap, persistData]);
+
   const value = {
     emps,
     evals,
@@ -156,6 +212,8 @@ export function AppProvider({ children }) {
     restoreSession,
     loadData,
     persistData,
+    addEmployee,
+    updateEmployee,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
