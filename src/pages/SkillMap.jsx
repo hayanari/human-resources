@@ -80,7 +80,7 @@ export default function SkillMap({ onOpenSkillSettings, skillItemsVersion = 0 })
   }
 
   return (
-    <div>
+    <div style={{ width: '100%' }}>
       <div className="sec-hd">
         <div className="sec-title">スキルマップ・習熟度管理</div>
         <div style={{ display: 'flex', gap: 8 }}>
@@ -103,21 +103,17 @@ export default function SkillMap({ onOpenSkillSettings, skillItemsVersion = 0 })
       </div>
 
       <div
+        className="skillmap-legend"
         style={{
           display: 'flex',
-          gap: 7,
+          gap: 8,
           flexWrap: 'wrap',
-          marginBottom: 14,
-          fontSize: 11,
-          fontWeight: 700,
+          marginBottom: 16,
+          alignItems: 'center',
         }}
       >
         {LV_LABELS.map((lbl, i) => (
-          <span
-            key={i}
-            className={`lv-badge lv${i}`}
-            style={{ padding: '4px 10px', borderRadius: 999, border: '1px solid transparent' }}
-          >
+          <span key={i} className={`lv-legend-item lv${i}`} title={`習熟度 Lv${i}`}>
             Lv{i} {lbl}
           </span>
         ))}
