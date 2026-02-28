@@ -534,33 +534,35 @@ function restoreSession(){
 function doLogin(){
   try{
     var uid=document.getElementById('li-id').value.trim();
-  var pw=document.getElementById('li-pw').value;
-  if(!uid||!pw){showLoginErr('IDとパスワードを入力してください');return;}
-  var users=getUsers()||initUsers();
-  var user=users.filter(function(u){return u.id===uid;})[0];
-  if(!user){showLoginErr('ユーザーIDが見つかりません');return;}
-  var h=hashPw(pw);
-  if(h!==user.pwHash){showLoginErr('パスワードが正しくありません');return;}
-  currentUser=Object.assign({},user);
-  localStorage.setItem(SESSION_KEY, JSON.stringify({userId:user.id, at:Date.now()}));
-  document.getElementById('login-overlay').classList.add('hidden');
-  updateAuthUI();
-  renderAll();
-  toast(user.name+'（'+roleLabel(user.role)+'）でログインしました','suc');
+    var pw=document.getElementById('li-pw').value;
+    if(!uid||!pw){showLoginErr('IDとパスワードを入力してください');return;}
+    var users=getUsers()||initUsers();
+    var user=users.filter(function(u){return u.id===uid;})[0];
+    if(!user){showLoginErr('ユーザーIDが見つかりません');return;}
+    var h=hashPw(pw);
+    if(h!==user.pwHash){showLoginErr('パスワードが正しくありません');return;}
+    currentUser=Object.assign({},user);
+    localStorage.setItem(SESSION_KEY, JSON.stringify({userId:user.id, at:Date.now()}));
+    var overlay=document.getElementById('login-overlay');
+    if(overlay) overlay.classList.add('hidden');
+    updateAuthUI();
+    renderAll();
+    toast(user.name+'（'+roleLabel(user.role)+'）でログインしました','suc');
   }catch(e){
-    // Silent error
+    console.error('doLogin error:',e);
+    showLoginErr('ログイン時にエラーが発生しました。コンソールを確認してください。');
   }
 }
 function doLoginQuick(uid,pw){
   try{
     var idEl=document.getElementById('li-id');
     var pwEl=document.getElementById('li-pw');
-    if(!idEl||!pwEl)return;
+    if(!idEl||!pwEl){console.error('Login form elements not found');return;}
     idEl.value=uid;
     pwEl.value=pw;
     doLogin();
   }catch(e){
-    // Silent error
+    console.error('doLoginQuick error:',e);
   }
 }
 function logout(){
@@ -705,9 +707,15 @@ async function startup(){
     initUsers();
     var restored=restoreSession();
     if(restored){
-      document.getElementById('login-overlay').classList.add('hidden');
-      var fromSupabase=await loadFromSupabase();
+      var fromSupabase=false;
+      try{
+        fromSupabase=await Promise.race([loadFromSupabase(),new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'));},8000);})]);
+      }catch(loadErr){
+        console.warn('Supabase load failed, using local data:',loadErr);
+      }
       if(fromSupabase&&emps.length){
+        var overlay=document.getElementById('login-overlay');
+        if(overlay) overlay.classList.add('hidden');
         updateAuthUI();renderAll();updBadge();
         toast('Supabaseからデータを読み込みました（'+emps.length+'名）');
       }else{
@@ -719,12 +727,16 @@ async function startup(){
             loadedFile=d.loadedFile||'社員データ.xlsx';
           }catch(e){}
         }
+        var overlay=document.getElementById('login-overlay');
+        if(overlay) overlay.classList.add('hidden');
         updateAuthUI();renderAll();updBadge();
         if(emps.length) toast('前回のデータを復元しました（'+emps.length+'名）');
       }
     }
   }catch(e){
-    document.getElementById('login-overlay').classList.remove('hidden');
+    console.error('startup error:',e);
+    var overlay=document.getElementById('login-overlay');
+    if(overlay) overlay.classList.remove('hidden');
   }
 }
 startup();
