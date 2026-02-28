@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate-excel": "node scripts/generate-excel-template.js"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",

@@ -9,9 +9,11 @@ import Dashboard from './pages/Dashboard';
 import Employees from './pages/Employees';
 import SkillMap from './pages/SkillMap';
 import Org from './pages/Org';
+import Certs from './pages/Certs';
+import { exportToExcel } from './lib/exportExcel';
 
 function App() {
-  const { currentUser, restoreSession, loadData } = useApp();
+  const { currentUser, restoreSession, loadData, emps, evals } = useApp();
   const [content, setContent] = useState(null);
   const [page, setPage] = useState('dashboard');
   const [loadModalOpen, setLoadModalOpen] = useState(false);
@@ -62,7 +64,18 @@ function App() {
             >
               {topbar.addEmp || '＋ 社員追加'}
             </button>
-            <button className="btn btn-g">{topbar.saveExcel || '💾 Excel保存'}</button>
+            <button
+              className="btn btn-g"
+              onClick={() => {
+                if (exportToExcel(emps, evals)) {
+                  alert('Excelを保存しました');
+                } else {
+                  alert('XLSX ライブラリが読み込まれていません');
+                }
+              }}
+            >
+              {topbar.saveExcel || '💾 Excel保存'}
+            </button>
           </div>
         </header>
         <div className="content">
@@ -87,6 +100,9 @@ function App() {
               />
             )}
           </div>
+          <div className={`page ${page === 'certs' ? 'active' : ''}`}>
+            {page === 'certs' && <Certs />}
+          </div>
           <div className={`page ${page === 'org' ? 'active' : ''}`}>
             {page === 'org' && (
               <Org
@@ -97,7 +113,7 @@ function App() {
               />
             )}
           </div>
-          {page !== 'dashboard' && page !== 'employees' && page !== 'skillmap' && page !== 'org' && (
+          {page !== 'dashboard' && page !== 'employees' && page !== 'skillmap' && page !== 'certs' && page !== 'org' && (
             <div className={`page active`}>
               <div className="empty">
                 <div className="empty-ico">📄</div>
