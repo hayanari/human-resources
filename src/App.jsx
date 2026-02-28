@@ -21,6 +21,7 @@ function App() {
   const [skillItemsVersion, setSkillItemsVersion] = useState(0);
   const [addEmpModalOpen, setAddEmpModalOpen] = useState(false);
   const [initialDeptFilter, setInitialDeptFilter] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     fetch('/content.json')
@@ -50,7 +51,24 @@ function App() {
 
   return (
     <>
-      <Sidebar content={content} page={page} setPage={setPage} />
+      <Sidebar
+        content={content}
+        page={page}
+        setPage={(p) => {
+          setPage(p);
+          setSidebarOpen(false);
+        }}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+      <button
+        type="button"
+        className="hamburger"
+        aria-label="メニューを開く"
+        onClick={() => setSidebarOpen(true)}
+      >
+        <span /><span /><span />
+      </button>
       <div className="main">
         <header className="topbar">
           <div className="top-title">{pageTitle}</div>

@@ -8,7 +8,7 @@ function roleBadgeClass(r) {
   return { admin: 'role-bdg-admin', evaluator: 'role-bdg-evaluator', viewer: 'role-bdg-viewer' }[r] || 'role-bdg-viewer';
 }
 
-export default function Sidebar({ content, page, setPage }) {
+export default function Sidebar({ content, page, setPage, isOpen = false, onClose }) {
   const { currentUser, logout } = useApp();
   const app = content?.app || {};
   const nav = content?.nav || {};
@@ -26,8 +26,15 @@ export default function Sidebar({ content, page, setPage }) {
   };
 
   return (
-    <nav className="sb">
-      <div className="sb-logo">
+    <>
+      {onClose && isOpen && <div className="sb-backdrop" onClick={onClose} aria-hidden="true" />}
+      <nav className={`sb ${isOpen ? 'sb-open' : ''}`}>
+        {onClose && (
+          <button type="button" className="sb-close-btn" onClick={onClose} aria-label="メニューを閉じる">
+            ✕
+          </button>
+        )}
+        <div className="sb-logo">
         <div className="sb-mark">H</div>
         <div>
           <div className="sb-text">HR<span>ナビ</span></div>
@@ -43,6 +50,7 @@ export default function Sidebar({ content, page, setPage }) {
                 key={it.page}
                 className={`sb-item ${it.badge ? 'sb-badge-wrap' : ''} ${page === it.page ? 'active' : ''}`}
                 onClick={() => setPage(it.page)}
+                role="button"
                 data-page={it.page}
               >
                 <span className="sb-ico">{it.icon}</span>
@@ -79,6 +87,7 @@ export default function Sidebar({ content, page, setPage }) {
           ))}
         </div>
       </div>
-    </nav>
+      </nav>
+    </>
   );
 }
