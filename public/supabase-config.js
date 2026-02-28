@@ -1,0 +1,3 @@
+
+window.SUPABASE_URL = 'https://tstrztoevjrplympcohw.supabase.co';
+window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHJ6dG9ldmpycGx5bXBjb2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNTEwNTksImV4cCI6MjA4NzgyNzA1OX0.DoNMoUSaPKKZtMcW18E3d6LlwYbEkEIappffb50LcKU';  // anon public key をここに貼り付け
