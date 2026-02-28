@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 
 function EmpCard({ emp, photoMap }) {
@@ -41,11 +41,18 @@ function EmpCard({ emp, photoMap }) {
   );
 }
 
-export default function Employees({ content, onOpenAddEmp }) {
+export default function Employees({ content, onOpenAddEmp, initialDeptFilter = '', onClearInitialDeptFilter }) {
   const { emps, photoMap } = useApp();
   const [search, setSearch] = useState('');
-  const [deptFilter, setDeptFilter] = useState('');
+  const [deptFilter, setDeptFilter] = useState(initialDeptFilter);
   const [posFilter, setPosFilter] = useState('');
+
+  useEffect(() => {
+    if (initialDeptFilter) {
+      setDeptFilter(initialDeptFilter);
+      onClearInitialDeptFilter?.();
+    }
+  }, [initialDeptFilter, onClearInitialDeptFilter]);
 
   const depts = useMemo(() => [...new Set(emps.map((e) => e.dept).filter(Boolean))].sort(), [emps]);
   const positions = useMemo(() => [...new Set(emps.map((e) => e.position).filter(Boolean))].sort(), [emps]);
@@ -81,7 +88,7 @@ export default function Employees({ content, onOpenAddEmp }) {
   }, [filtered]);
 
   return (
-    <div className="page active">
+    <>
       <div className="srch">
         <div className="srch-inp">
           <span style={{ color: 'var(--txl)' }}>🔍</span>
@@ -135,6 +142,6 @@ export default function Employees({ content, onOpenAddEmp }) {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }

@@ -8,6 +8,7 @@ import AddEmployeeModal from './components/AddEmployeeModal';
 import Dashboard from './pages/Dashboard';
 import Employees from './pages/Employees';
 import SkillMap from './pages/SkillMap';
+import Org from './pages/Org';
 
 function App() {
   const { currentUser, restoreSession, loadData } = useApp();
@@ -17,6 +18,7 @@ function App() {
   const [skillSetModalOpen, setSkillSetModalOpen] = useState(false);
   const [skillItemsVersion, setSkillItemsVersion] = useState(0);
   const [addEmpModalOpen, setAddEmpModalOpen] = useState(false);
+  const [initialDeptFilter, setInitialDeptFilter] = useState('');
 
   useEffect(() => {
     fetch('/content.json')
@@ -72,6 +74,8 @@ function App() {
               <Employees
                 content={content}
                 onOpenAddEmp={() => setAddEmpModalOpen(true)}
+                initialDeptFilter={initialDeptFilter}
+                onClearInitialDeptFilter={() => setInitialDeptFilter('')}
               />
             )}
           </div>
@@ -83,7 +87,17 @@ function App() {
               />
             )}
           </div>
-          {page !== 'dashboard' && page !== 'employees' && page !== 'skillmap' && (
+          <div className={`page ${page === 'org' ? 'active' : ''}`}>
+            {page === 'org' && (
+              <Org
+                onDeptClick={(dept) => {
+                  setInitialDeptFilter(dept);
+                  setPage('employees');
+                }}
+              />
+            )}
+          </div>
+          {page !== 'dashboard' && page !== 'employees' && page !== 'skillmap' && page !== 'org' && (
             <div className={`page active`}>
               <div className="empty">
                 <div className="empty-ico">📄</div>
