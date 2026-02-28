@@ -486,6 +486,62 @@ function renderCerts(){
 }
 
 
+function openEmpMo(mode){
+  editEmpId=(mode&&mode!=='add')?mode:null;
+  const e=editEmpId?emps.find(x=>x.id===editEmpId):null;
+  document.getElementById('emp-mo-title').textContent=e?'社員を編集':'社員を追加';
+  const ids=['f-name','f-id','f-belong','f-dept','f-pos','f-job','f-grade','f-goubou','f-email','f-phone','f-joined','f-dob','f-zip','f-address','f-name-changed','f-address-changed','f-skills','f-notes'];
+  const keys=['name','id','belong','dept','position','jobType','grade','goubou','email','phone','joined','dob','zip','address','nameChanged','addressChanged','skills','notes'];
+  ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.value=e?((keys[i]==='skills'?(e.skills||[]).join(', '):e[keys[i]])||''):'';});
+  document.getElementById('grade-history-rows').innerHTML='';
+  (e?.gradeHistory||[]).forEach(gh=>addGradeHistoryRow(gh));
+  document.getElementById('transfer-rows').innerHTML='';
+  (e?.transferHistory||[]).forEach(t=>addTransferRow(t));
+  document.getElementById('cert-rows').innerHTML='';
+  (e?.certs||[]).forEach(c=>addCertRow(c));
+  if(!e){addGradeHistoryRow({});addCertRow({});}
+  openMo('emp-mo');
+}
+function addGradeHistoryRow(gh){
+  gh=gh||{};
+  const d=document.createElement('div');
+  d.className='grade-hist-row';
+  d.style.cssText='display:grid;grid-template-columns:110px 80px 80px 1fr auto;gap:8px;align-items:end;margin-bottom:8px';
+  d.innerHTML='<div class="fg"><label>日付</label><input class="finp" type="date" value="'+(gh.date||'')+'"></div><div class="fg"><label>等級</label><input class="finp" placeholder="1" value="'+(gh.grade||'')+'"></div><div class="fg"><label>号棒</label><input class="finp" placeholder="50" value="'+(gh.goubou||'')+'"></div><div class="fg"><label>理由</label><input class="finp" placeholder="昇格等" value="'+(gh.reason||'')+'"></div><button class="btn btn-d btn-xs" style="align-self:flex-end;margin-bottom:2px" onclick="this.closest(\'.grade-hist-row\').remove()">✕</button>';
+  document.getElementById('grade-history-rows').appendChild(d);
+}
+function addCertRow(c){
+  c=c||{};
+  const d=document.createElement('div');
+  d.className='cert-row';
+  d.style.cssText='display:grid;grid-template-columns:1fr 110px 110px auto;gap:8px;align-items:end;margin-bottom:8px';
+  d.innerHTML='<div class="fg"><label>資格名</label><input class="finp" placeholder="1級土木施工管理技士" value="'+(c.name||'')+'"></div><div class="fg"><label>取得日</label><input class="finp" type="date" value="'+(c.acquired||'')+'"></div><div class="fg"><label>有効期限</label><input class="finp" type="date" value="'+(c.expiry||'')+'"></div><button class="btn btn-d btn-xs" style="align-self:flex-end;margin-bottom:2px" onclick="this.closest(\'.cert-row\').remove()">✕</button>';
+  document.getElementById('cert-rows').appendChild(d);
+}
+function openSkillSetMo(){
+  const list=document.getElementById('skill-set-list');
+  if(!list)return;
+  list.innerHTML=skillItems.map((sk,i)=>'<div class="skill-set-row" style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><input class="finp" value="'+sk+'" style="flex:1"><button class="btn btn-d btn-xs" onclick="this.closest(\'.skill-set-row\').remove()">✕</button></div>').join('');
+  openMo('skill-set-mo');
+}
+function addSkillRow(){
+  const list=document.getElementById('skill-set-list');
+  if(!list)return;
+  const d=document.createElement('div');
+  d.className='skill-set-row';
+  d.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:8px';
+  d.innerHTML='<input class="finp" placeholder="新規スキル名" style="flex:1"><button class="btn btn-d btn-xs" onclick="this.closest(\'.skill-set-row\').remove()">✕</button>';
+  list.appendChild(d);
+}
+function saveSkillSettings(){
+  const rows=document.querySelectorAll('#skill-set-list .skill-set-row');
+  skillItems=[...rows].map(r=>r.querySelector('input')?.value?.trim()).filter(Boolean);
+  if(!skillItems.length){skillItems=[...DEFAULT_SKILLS];}
+  localStorage.setItem('hr-skills',JSON.stringify(skillItems));
+  closeMo('skill-set-mo');
+  renderSkillMap();
+  toast('スキル項目を保存しました','suc');
+}
 function addTransferRow(t){
   t=t||{};
   const d=document.createElement('div');
@@ -784,21 +840,23 @@ function initLoginHandlers(){
   if(lb)lb.addEventListener('click',doLogin);
   bindLoginDemoRows();
 }
-// Vite がモジュールとしてビルドするため、onclick から呼ぶ関数を window に公開
-if(typeof window!=='undefined'){
-  window.doLogin=doLogin;window.doLoginQuick=doLoginQuick;window.nav=nav;window.nav_userMgmt=nav_userMgmt;
-  window.changePw=changePw;window.logout=logout;window.openLoadModal=openLoadModal;window.openEmpMo=openEmpMo;
-  window.exportExcel=exportExcel;window.resetEvalItems=resetEvalItems;window.saveEvalSettings=saveEvalSettings;
-  window.closeMo=closeMo;window.addGradeHistoryRow=addGradeHistoryRow;window.addTransferRow=addTransferRow;window.addCertRow=addCertRow;
-  window.saveEmp=saveEmp;window.addSkillRow=addSkillRow;window.saveSkillSettings=saveSkillSettings;
-  window.openAddUser=openAddUser;window.saveUser=saveUser;window.saveChangePw=saveChangePw;window.resumeData=resumeData;
-  window.toggleDept=toggleDept;window.toggleCert=toggleCert;window.toggleSL=toggleSL;window.swTab=swTab;
-  window.showDetail=showDetail;window.delEmp=delEmp;window.renderEmps=renderEmps;window.renderSkillMap=renderSkillMap;window.renderEvalList=renderEvalList;
-  window.editUser=editUser;window.delUser=delUser;
-  if(typeof openSkillSetMo==='function')window.openSkillSetMo=openSkillSetMo;
-  if(typeof openEvalMo==='function')window.openEvalMo=openEvalMo;
-  if(typeof onEvalEmpChange==='function')window.onEvalEmpChange=onEvalEmpChange;
-  if(typeof saveEval==='function')window.saveEval=saveEval;
+// Vite がモジュールとしてビルドするため、onclick から呼ぶ関数を window に公開（inline handler はグローバル参照が必要）
+function exposeGlobals(){
+  const g=typeof globalThis!=='undefined'?globalThis:typeof window!=='undefined'?window:null;
+  if(!g)return;
+  g.doLogin=doLogin;g.doLoginQuick=doLoginQuick;g.nav=nav;g.nav_userMgmt=nav_userMgmt;
+  g.changePw=changePw;g.logout=logout;g.openLoadModal=openLoadModal;g.openEmpMo=openEmpMo;
+  g.exportExcel=exportExcel;g.resetEvalItems=resetEvalItems;g.saveEvalSettings=saveEvalSettings;
+  g.closeMo=closeMo;g.addGradeHistoryRow=addGradeHistoryRow;g.addTransferRow=addTransferRow;g.addCertRow=addCertRow;
+  g.saveEmp=saveEmp;g.addSkillRow=addSkillRow;g.saveSkillSettings=saveSkillSettings;g.openSkillSetMo=openSkillSetMo;
+  g.openAddUser=openAddUser;g.saveUser=saveUser;g.saveChangePw=saveChangePw;g.resumeData=resumeData;
+  g.toggleDept=toggleDept;g.toggleCert=toggleCert;g.toggleSL=toggleSL;g.swTab=swTab;
+  g.showDetail=showDetail;g.delEmp=delEmp;g.renderEmps=renderEmps;g.renderSkillMap=renderSkillMap;g.renderEvalList=renderEvalList;
+  g.editUser=editUser;g.delUser=delUser;
+  if(typeof openEvalMo==='function')g.openEvalMo=openEvalMo;else g.openEvalMo=()=>{toast('評価モーダルは準備中です');};
+  if(typeof onEvalEmpChange==='function')g.onEvalEmpChange=onEvalEmpChange;else g.onEvalEmpChange=()=>{};
+  if(typeof saveEval==='function')g.saveEval=saveEval;else g.saveEval=()=>{toast('評価保存は準備中です');};
 }
+exposeGlobals();
 initLoginHandlers();
 startup();
